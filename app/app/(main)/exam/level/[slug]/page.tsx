@@ -39,6 +39,7 @@ export default async function ExamLevelPage({ params }: { params: { slug: string
     .where(and(eq(posts.isPublished, true), eq(posts.examLevel, level.value)))
     .orderBy(desc(posts.publishedAt))
     .limit(24)
+    .catch(() => [])
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 }
 
 export default async function PostsPage() {
-  const posts = await getPublishedPosts(24)
+  const posts = await getPublishedPosts(24).catch(() => [])
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

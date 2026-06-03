@@ -1,7 +1,7 @@
 import { getExamTopics } from '@/lib/db/queries/exam'
 
 export default async function ExamTopicsPage() {
-  const topics = await getExamTopics()
+  const topics = await getExamTopics().catch(() => [])
 
   return (
     <div>

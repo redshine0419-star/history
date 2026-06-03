@@ -28,7 +28,7 @@ export default async function RegionPage({ params }: { params: { slug: string } 
   const region = REGIONS[params.slug as Region]
   if (!region) notFound()
 
-  const posts = await getPostsByRegion(params.slug as Region, 24)
+  const posts = await getPostsByRegion(params.slug as Region, 24).catch(() => [])
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

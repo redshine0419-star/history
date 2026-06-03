@@ -4,9 +4,9 @@ import { eq, count } from 'drizzle-orm'
 
 export default async function AdminDashboard() {
   const [totalPosts, publishedPosts, topicCount] = await Promise.all([
-    db.select({ count: count() }).from(posts),
-    db.select({ count: count() }).from(posts).where(eq(posts.isPublished, true)),
-    db.select({ count: count() }).from(examTopics),
+    db.select({ count: count() }).from(posts).catch(() => [{ count: 0 }]),
+    db.select({ count: count() }).from(posts).where(eq(posts.isPublished, true)).catch(() => [{ count: 0 }]),
+    db.select({ count: count() }).from(examTopics).catch(() => [{ count: 0 }]),
   ])
 
   return (

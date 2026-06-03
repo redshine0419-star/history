@@ -22,8 +22,8 @@ const ERA_CARDS = [
 
 export default async function ExamPage() {
   const [topics, examPosts] = await Promise.all([
-    getExamTopics(),
-    getExamPosts(6),
+    getExamTopics().catch(() => []),
+    getExamPosts(6).catch(() => []),
   ])
 
   const topTopics = topics.slice(0, 10)

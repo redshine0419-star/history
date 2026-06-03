@@ -4,7 +4,7 @@ import { getAllPublishedSlugs } from '@/lib/db/queries/posts'
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://worldhistory.kr'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const slugs = await getAllPublishedSlugs()
+  const slugs = await getAllPublishedSlugs().catch(() => [] as string[])
 
   const postEntries = slugs.map((slug) => ({
     url: `${BASE_URL}/posts/${slug}`,

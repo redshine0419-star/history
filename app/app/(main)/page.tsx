@@ -14,9 +14,9 @@ const REGION_LINKS = [
 
 export default async function HomePage() {
   const [featured, recentPosts, popularPosts] = await Promise.all([
-    getFeaturedPost(),
-    getPublishedPosts(6),
-    getPopularPosts(5),
+    getFeaturedPost().catch(() => undefined),
+    getPublishedPosts(6).catch(() => []),
+    getPopularPosts(5).catch(() => []),
   ])
 
   return (

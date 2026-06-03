@@ -29,7 +29,7 @@ export default async function EraPage({ params }: { params: { slug: string } }) 
   const era = ERAS[params.slug as Era]
   if (!era) notFound()
 
-  const posts = await getPostsByEra(params.slug as Era, 24)
+  const posts = await getPostsByEra(params.slug as Era, 24).catch(() => [])
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

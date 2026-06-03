@@ -29,8 +29,12 @@ const EXAM_BADGE: Record<string, string | null> = {
 }
 
 export async function generateStaticParams() {
-  const slugs = await getAllPublishedSlugs()
-  return slugs.map((slug) => ({ slug }))
+  try {
+    const slugs = await getAllPublishedSlugs()
+    return slugs.map((slug) => ({ slug }))
+  } catch {
+    return []
+  }
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
