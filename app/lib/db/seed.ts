@@ -42,10 +42,11 @@ async function seed() {
   console.log('Seeding examTopics...')
   await db.insert(examTopics).values(
     SEED_TOPICS.map((t) => ({
-      ...t,
-      era: t.era as any,
-      region: t.region as any,
-      examLevel: t.examLevel as any,
+      keyword: t.keyword,
+      era: t.era,
+      region: t.region,
+      examLevel: t.examLevel,
+      frequency: t.frequency,
       rounds: [...t.rounds],
     })),
   )
