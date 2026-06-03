@@ -59,13 +59,12 @@
 │   └── 현대 (/era/contemporary)        1945~현재
 │
 ├── 세계사 검정 (/exam)                 ← 시험 대비 별도 섹션 (수험생용)
-│   ├── 시험 안내 (/exam/guide)
+│   ├── 시험 안내 (/exam/guide)         ← 시험 일정·급수·합격 기준 안내
 │   ├── 급수별 핵심 정리
 │   │   ├── 1·2급 심화 (/exam/level/advanced)
 │   │   └── 3·4급 기본 (/exam/level/basic)
 │   ├── 시대별 핵심 요약 (/exam/era)
-│   ├── 기출 유형 Q&A (/exam/questions)
-│   └── 모의고사 (/exam/mock-test)
+│   └── 기출 유형 Q&A (/exam/questions) ← 기출 문제 재현 아님, examTopics 기반 독창 콘텐츠
 │
 ├── 역사 퀴즈 (/quiz)                   ← 바이럴용 인터랙티브
 └── 검색 (/search)
@@ -173,38 +172,18 @@ export const posts = pgTable('posts', {
   updatedAt:    timestamp('updated_at').defaultNow().notNull(),
 })
 
-// 세계사 검정 시험 기출 Q&A (별도 테이블)
-export const examQuestions = pgTable('exam_questions', {
-  id:           serial('id').primaryKey(),
-  postId:       integer('post_id').references(() => posts.id), // 연관 포스트 (nullable)
-  era:          eraEnum('era').notNull(),
-  examLevel:    examLevelEnum('exam_level').notNull(),
-  keyword:      varchar('keyword', { length: 100 }).notNull(), // 핵심 개념
-  question:     text('question').notNull(),
-  options:      text('options').array().notNull(),             // 4지선다
-  answer:       integer('answer').notNull(),                   // 정답 index (0~3)
-  explanation:  text('explanation').notNull(),                 // 해설
-  year:         integer('year'),                               // 기출 연도
-  isActive:     boolean('is_active').default(true),
-  createdAt:    timestamp('created_at').defaultNow(),
-})
-
-// 모의고사 세트
-export const mockTests = pgTable('mock_tests', {
+// 세계사 검정 기출 토픽 맵 (기출 문제 재현 금지 — 토픽/키워드만 추출)
+// 역할: AI 콘텐츠 생성 우선순위 나침반 + 시험 연계 포스트 태깅 기준
+export const examTopics = pgTable('exam_topics', {
   id:          serial('id').primaryKey(),
-  title:       varchar('title', { length: 200 }).notNull(),
+  keyword:     varchar('keyword', { length: 100 }).notNull(),  // ex) "십자군 전쟁"
+  era:         eraEnum('era').notNull(),
+  region:      regionEnum('region').notNull(),
   examLevel:   examLevelEnum('exam_level').notNull(),
-  description: text('description'),
-  isActive:    boolean('is_active').default(true),
+  frequency:   integer('frequency').default(1).notNull(),      // 출제된 회차 수
+  rounds:      integer('rounds').array(),                      // [12, 13, 14]
+  postId:      integer('post_id').references(() => posts.id),  // 연결된 콘텐츠 (생성 후 연결)
   createdAt:   timestamp('created_at').defaultNow(),
-})
-
-// 모의고사 ↔ 문제 연결
-export const mockTestQuestions = pgTable('mock_test_questions', {
-  id:         serial('id').primaryKey(),
-  testId:     integer('test_id').references(() => mockTests.id, { onDelete: 'cascade' }),
-  questionId: integer('question_id').references(() => examQuestions.id),
-  order:      integer('order').notNull(),
 })
 
 // 흥미 퀴즈 (바이럴용, /quiz 페이지)
@@ -262,10 +241,7 @@ worldhistory/
 │   │   │   │   └── basic/page.tsx        # 3·4급 핵심 정리
 │   │   │   ├── era/
 │   │   │   │   └── [slug]/page.tsx       # 시대별 핵심 요약
-│   │   │   ├── questions/page.tsx        # 기출 유형 Q&A
-│   │   │   └── mock-test/
-│   │   │       ├── page.tsx              # 모의고사 목록
-│   │   │       └── [id]/page.tsx         # 모의고사 풀기
+│   │   │   └── questions/page.tsx        # 기출 유형 Q&A (examTopics 기반 독창 콘텐츠)
 │   │   ├── quiz/page.tsx                 # 흥미 퀴즈 (바이럴)
 │   │   ├── search/page.tsx               # 검색
 │   │   └── about/page.tsx
@@ -278,8 +254,7 @@ worldhistory/
 │   │       │   ├── new/page.tsx
 │   │       │   └── [id]/page.tsx
 │   │       ├── exam/
-│   │       │   ├── questions/page.tsx    # 기출 문제 관리
-│   │       │   └── mock-tests/page.tsx   # 모의고사 관리
+│   │       │   └── topics/page.tsx       # examTopics 관리 (AI 생성 우선순위)
 │   │       ├── generate/page.tsx         # AI 생성
 │   │       └── analytics/page.tsx
 │   ├── api/
@@ -402,16 +377,8 @@ worldhistory/
 [시대별 핵심 정리 바로가기]
 - 고대 | 중세 | 근세 | 근대 | 현대 타임라인 카드
 
-[최근 추가된 기출 Q&A]
-[모의고사 시작하기 CTA]
-```
-
-### 모의고사 (/exam/mock-test/[id])
-```
-- 20문항 4지선다
-- 문제당 제한시간 표시 (선택)
-- 제출 후: 점수 + 급수 환산 + 틀린 문제 해설
-- 결과 SNS 공유 → 바이럴
+[최근 추가된 기출 유형 Q&A]
+  ← examTopics 빈출 키워드로 AI 생성한 독창 콘텐츠 (기출 문제 원문 재현 아님)
 ```
 
 ### 역사 퀴즈 (/quiz)
@@ -420,6 +387,63 @@ worldhistory/
 - "나의 세계사 등급은?" 결과 카드
 - 인스타 스토리 공유 이미지 자동 생성
 ```
+
+---
+
+## 기출 토픽 맵 (12~14회차 분석)
+
+> **원칙**: 기출 문제를 그대로 제공하지 않음. PDF에서 토픽/키워드만 추출 →  
+> AI가 해당 토픽으로 **독창적 콘텐츠** 생성. `examTopics` 테이블의 시드 데이터.
+
+### 빈출 3회 (12·13·14회차 모두 출제) — 최우선 콘텐츠 생성
+
+| keyword | era | region | examLevel | rounds |
+|---|---|---|---|---|
+| 그리스 민주정·아테네 (페리클레스/솔론/스파르타) | ancient | europe | advanced | [12,13,14] |
+| 로마 (카이사르/아우구스투스/트라야누스/그라쿠스) | ancient | europe | advanced | [12,13,14] |
+| 오스만제국 (탄지마트/데브시르메/무스타파케말) | medieval | middle-east-africa | advanced | [12,13,14] |
+| 명·청 왕조 (장거정/영락제/홍무제/강희제) | early-modern | asia | advanced | [12,13,14] |
+| 윌슨·민족자결·파리강화회의 | modern | europe | basic | [12,13,14] |
+| 스페인의 아메리카 식민지 | early-modern | americas | basic | [12,13,14] |
+| 도쿄 전범 재판 | contemporary | asia | basic | [13,14] |
+| 이스라엘·팔레스타인 분쟁 | contemporary | middle-east-africa | basic | [13,14] |
+| 대만 (현대 국제 관계) | contemporary | asia | basic | [12,14] |
+| 마르코 폴로·원 제국 | medieval | asia | basic | [12,14] |
+| 닉슨 독트린 | contemporary | americas | basic | [12,14] |
+| 아편전쟁·난징조약 | modern | asia | advanced | [12,13] |
+| 중국 근대화 (양무운동·변법자강) | modern | asia | advanced | [13,14] |
+| 중국 혁명 (문화대혁명·톈안먼·4·12쿠데타) | contemporary | asia | advanced | [12,13,14] |
+
+### 빈출 2회 — 2순위 콘텐츠 생성
+
+| keyword | era | region | examLevel | rounds |
+|---|---|---|---|---|
+| 십자군 전쟁 | medieval | europe | advanced | [12,13] |
+| 흑사병 | medieval | europe | basic | [12,14] |
+| 르네상스 | early-modern | europe | basic | [13,14] |
+| 종교개혁 (루터·칼뱅) | early-modern | europe | basic | [12,13] |
+| 프랑스 혁명 | early-modern | europe | advanced | [12,14] |
+| 나폴레옹 | modern | europe | advanced | [13,14] |
+| 산업혁명 | modern | europe | basic | [12,13] |
+| 제국주의 (아프리카 분할) | modern | middle-east-africa | basic | [13,14] |
+| 제1차 세계대전 | modern | europe | advanced | [12,14] |
+| 러시아 혁명 | modern | europe | advanced | [13,14] |
+| 히틀러·나치즘 | modern | europe | advanced | [12,13] |
+| 태평양 전쟁 | modern | asia | basic | [12,14] |
+| 인도 독립 (간디) | modern | asia | basic | [13,14] |
+| 냉전 (트루먼·마샬플랜) | contemporary | europe | basic | [12,13] |
+| 유럽 통합 (EU 역사) | contemporary | europe | basic | [13,14] |
+
+### 시사연계 문제 패턴 (Q43-46 — 매회차 현재 이슈 + 역사 연결)
+
+| 회차 | 시사 이슈 | 역사 연결 키워드 |
+|---|---|---|
+| 12회 | 대만 해협 긴장 | 냉전·국공내전 |
+| 13회 | 팔레스타인 전쟁 | 맥마흔 선언·밸푸어 선언 |
+| 14회 | 대만 총통 선거 | 장제스·중화민국 |
+
+> **콘텐츠 전략**: 시사연계 토픽은 "현재 뉴스 + 역사 배경" 형식으로 가장 검색량 높음 →  
+> 국제 뉴스 발생 시 즉시 관련 역사 포스트 생성하는 반자동화 루틴 구축
 
 ---
 
