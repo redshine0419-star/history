@@ -1,0 +1,43 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { generatePost } from '@/lib/ai/generate'
+import { db } from '@/lib/db'
+import { posts } from '@/lib/db/schema'
+import { slugify } from '@/lib/utils/slugify'
+
+export async function POST(req: NextRequest) {
+  const authHeader = req.headers.get('x-admin-key')
+  if (authHeader !== process.env.ADMIN_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { topic, hint, save } = await req.json()
+  if (!topic) return NextResponse.json({ error: 'topic required' }, { status: 400 })
+
+  const generated = await generatePost(topic, hint)
+
+  if (save) {
+    const slug = slugify(generated.title)
+    const [saved] = await db
+      .insert(posts)
+      .values({
+        slug,
+        title: generated.title,
+        question: generated.question,
+        answer: generated.answer,
+        fullStory: generated.fullStory,
+        summary: generated.summary,
+        region: generated.region,
+        era: generated.era,
+        examLevel: generated.examLevel,
+        examKeyword: generated.examKeyword,
+        tags: generated.tags,
+        seoTitle: generated.seoTitle,
+        seoDesc: generated.seoDesc,
+        isPublished: false,
+      })
+      .returning()
+    return NextResponse.json({ generated, saved })
+  }
+
+  return NextResponse.json({ generated })
+}
