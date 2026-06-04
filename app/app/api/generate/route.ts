@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generatePost } from '@/lib/ai/generate'
 import { db } from '@/lib/db'
-import { posts } from '@/lib/db/schema'
+import { posts, quizzes } from '@/lib/db/schema'
 import { slugify } from '@/lib/utils/slugify'
 
 export async function POST(req: NextRequest) {
@@ -36,6 +36,21 @@ export async function POST(req: NextRequest) {
         isPublished: false,
       })
       .returning()
+
+    // 퀴즈 저장
+    if (generated.quizzes?.length && saved.id) {
+      await db.insert(quizzes).values(
+        generated.quizzes.map((q) => ({
+          postId: saved.id,
+          question: q.question,
+          options: q.options,
+          answer: q.answer,
+          explanation: q.explanation,
+          isActive: true,
+        }))
+      )
+    }
+
     return NextResponse.json({ generated, saved })
   }
 
