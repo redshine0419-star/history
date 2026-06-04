@@ -1,6 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 const SYSTEM_PROMPT = `
 너는 세계사 전문 스토리텔러이자 SEO 최적화 전문가야.
@@ -53,13 +53,13 @@ export async function generatePost(topic: string, hint?: string): Promise<Genera
     ? `주제: ${topic}\n추가 맥락: ${hint}`
     : `주제: ${topic}`
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: userMessage }],
+  const model = client.getGenerativeModel({
+    model: 'gemini-2.0-flash',
+    systemInstruction: SYSTEM_PROMPT,
+    generationConfig: { responseMimeType: 'application/json' },
   })
 
-  const text = message.content[0].type === 'text' ? message.content[0].text : ''
+  const result = await model.generateContent(userMessage)
+  const text = result.response.text()
   return JSON.parse(text) as GeneratedPost
 }
