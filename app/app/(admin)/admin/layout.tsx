@@ -8,6 +8,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Link href="/admin" className="block px-3 py-2 rounded hover:bg-gray-100 text-sm">대시보드</Link>
         <Link href="/admin/posts" className="block px-3 py-2 rounded hover:bg-gray-100 text-sm">포스트 관리</Link>
         <Link href="/admin/generate" className="block px-3 py-2 rounded hover:bg-gray-100 text-sm">AI 생성</Link>
+        <Link href="/admin/generate/batch" className="block px-3 py-2 rounded hover:bg-gray-100 text-sm">일괄 자동 생성</Link>
         <Link href="/admin/exam/topics" className="block px-3 py-2 rounded hover:bg-gray-100 text-sm">기출 토픽</Link>
       </aside>
       <main className="flex-1 p-6">{children}</main>
