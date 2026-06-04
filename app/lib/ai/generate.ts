@@ -54,12 +54,13 @@ export async function generatePost(topic: string, hint?: string): Promise<Genera
     : `주제: ${topic}`
 
   const model = client.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-preview-05-20',
     systemInstruction: SYSTEM_PROMPT,
-    generationConfig: { responseMimeType: 'application/json' },
   })
 
   const result = await model.generateContent(userMessage)
-  const text = result.response.text()
+  const raw = result.response.text()
+  // 마크다운 코드블록 제거 후 파싱
+  const text = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
   return JSON.parse(text) as GeneratedPost
 }
