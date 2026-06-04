@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 
-const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
 
 const SYSTEM_PROMPT = `
 너는 세계사 전문 스토리텔러이자 SEO 최적화 전문가야.
@@ -53,14 +53,15 @@ export async function generatePost(topic: string, hint?: string): Promise<Genera
     ? `주제: ${topic}\n추가 맥락: ${hint}`
     : `주제: ${topic}`
 
-  const model = client.getGenerativeModel({
-    model: 'gemini-2.5-flash-preview-05-20',
-    systemInstruction: SYSTEM_PROMPT,
+  const response = await client.models.generateContent({
+    model: 'gemini-2.5-flash',
+    contents: userMessage,
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
+      responseMimeType: 'application/json',
+    },
   })
 
-  const result = await model.generateContent(userMessage)
-  const raw = result.response.text()
-  // 마크다운 코드블록 제거 후 파싱
-  const text = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim()
+  const text = response.text ?? ''
   return JSON.parse(text) as GeneratedPost
 }
