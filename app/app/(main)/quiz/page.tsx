@@ -27,7 +27,8 @@ export default function QuizPage() {
     setLoading(true)
     try {
       const res = await fetch('/api/quiz/random')
-      const data = await res.json()
+      const text = await res.text()
+      const data = text ? JSON.parse(text) : { quizzes: [] }
       setQuizzes(data.quizzes ?? [])
       setCurrent(0)
       setSelected(null)
