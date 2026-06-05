@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
         tags: generated.tags,
         seoTitle: generated.seoTitle,
         seoDesc: generated.seoDesc,
-        isPublished: false,
+        isPublished: true,
+        publishedAt: new Date(),
       })
       .returning()
 
