@@ -1,30 +1,21 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
-import { quizzes, posts } from '@/lib/db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { neon } from '@neondatabase/serverless'
 
 export async function GET() {
   try {
-    const rows = await db
-      .select({
-        id: quizzes.id,
-        postId: quizzes.postId,
-        question: quizzes.question,
-        options: quizzes.options,
-        answer: quizzes.answer,
-        explanation: quizzes.explanation,
-        postTitle: posts.title,
-        postSlug: posts.slug,
-      })
-      .from(quizzes)
-      .leftJoin(posts, eq(quizzes.postId, posts.id))
-      .where(eq(quizzes.isActive, true))
-      .orderBy(sql`RANDOM()`)
-      .limit(10)
-
+    const sql = neon(process.env.DATABASE_URL!)
+    const rows = await sql`
+      SELECT q.id, q.post_id, q.question, q.options, q.answer, q.explanation,
+             p.title as post_title, p.slug as post_slug
+      FROM quizzes q
+      LEFT JOIN posts p ON q.post_id = p.id
+      WHERE q.is_active = true
+      ORDER BY RANDOM()
+      LIMIT 10
+    `
     return NextResponse.json({ quizzes: rows })
   } catch (e) {
-    console.error('Quiz fetch error:', e)
-    return NextResponse.json({ quizzes: [] })
+    console.error('Quiz error:', e)
+    return NextResponse.json({ quizzes: [], error: String(e) })
   }
 }
