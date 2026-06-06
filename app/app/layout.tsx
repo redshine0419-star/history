@@ -22,6 +22,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-M914VTSQ5M" />
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-M914VTSQ5M');
+        `}} />
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT && (
           <script
             async
