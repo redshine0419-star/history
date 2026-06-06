@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPublishedPosts } from '@/lib/db/queries/posts';
 
-export const dynamic = 'force-dynamic';
-
 export async function GET() {
   try {
     const allPosts = await getPublishedPosts(200, 0);
@@ -14,6 +12,7 @@ export async function GET() {
 
     const recent5 = allPosts.slice(0, 5).map((p) => ({
       id: p.id,
+      title: (p as Record<string, unknown>).title as string ?? p.slug,
       slug: p.slug,
       publishedAt: p.publishedAt,
     }));
