@@ -3,7 +3,8 @@ import PostCard from '@/components/post/PostCard'
 import AdsenseUnit from '@/components/ads/AdsenseUnit'
 import { getExamPosts } from '@/lib/db/queries/posts'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: '기출 유형 Q&A',

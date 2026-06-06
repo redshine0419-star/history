@@ -6,8 +6,8 @@ import { getPostBySlug, getAllPublishedSlugs, incrementViewCount, getPublishedPo
 import { buildPostMetadata } from '@/lib/seo/metadata'
 import PostCard from '@/components/post/PostCard'
 
-export const dynamicParams = true
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const ERA_LABEL: Record<string, string> = {
   ancient: '고대 문명',

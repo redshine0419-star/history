@@ -3,7 +3,8 @@ import PostCard from '@/components/post/PostCard'
 import AdsenseUnit from '@/components/ads/AdsenseUnit'
 import { getPublishedPosts, getFeaturedPost, getPopularPosts } from '@/lib/db/queries/posts'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const REGION_LINKS = [
   { label: '유럽사', href: '/region/europe', emoji: '🏛️' },
