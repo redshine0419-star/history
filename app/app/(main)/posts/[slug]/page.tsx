@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import AdsenseUnit from '@/components/ads/AdsenseUnit'
-import { getPostBySlug, getAllPublishedSlugs, incrementViewCount, getPublishedPosts } from '@/lib/db/queries/posts'
+import { getPostBySlug, incrementViewCount, getPublishedPosts } from '@/lib/db/queries/posts'
 import { buildPostMetadata } from '@/lib/seo/metadata'
 import PostCard from '@/components/post/PostCard'
 
@@ -28,14 +28,6 @@ const EXAM_BADGE: Record<string, string | null> = {
   advanced: '세계사능력검정 1·2급 빈출',
 }
 
-export async function generateStaticParams() {
-  try {
-    const slugs = await getAllPublishedSlugs()
-    return slugs.map((slug) => ({ slug }))
-  } catch {
-    return []
-  }
-}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getPostBySlug(params.slug)

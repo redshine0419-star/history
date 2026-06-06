@@ -17,8 +17,9 @@ export async function getPostBySlug(slug: string): Promise<Post | undefined> {
   const result = await db
     .select()
     .from(posts)
-    .where(and(eq(posts.slug, slug), eq(posts.isPublished, true)))
+    .where(eq(posts.slug, slug))
     .limit(1)
+    .catch(() => [])
   return result[0]
 }
 
