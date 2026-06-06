@@ -66,9 +66,6 @@ export default function PostCard({ post }: Props) {
         )}
         <div className="mt-auto pt-2 text-xs text-gray-400 flex gap-3">
           <span>👁 {post.viewCount.toLocaleString()}</span>
-          {post.publishedAt && (
-            <span>{new Date(post.publishedAt).toLocaleDateString('ko-KR')}</span>
-          )}
         </div>
       </div>
     </Link>
