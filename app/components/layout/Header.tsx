@@ -24,7 +24,6 @@ const NAV_ITEMS = [
       { label: '현대', href: '/era/contemporary' },
     ],
   },
-  { label: '세계사 검정', href: '/exam' },
   { label: '역사 퀴즈', href: '/quiz' },
 ]
 

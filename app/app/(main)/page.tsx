@@ -92,18 +92,6 @@ export default async function HomePage() {
 
         {/* 사이드바 */}
         <aside className="lg:col-span-1 space-y-6">
-          {/* 세계사 검정 배너 */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-amber-800 font-bold text-sm mb-1">📝 세계사능력검정 준비 중?</p>
-            <p className="text-amber-700 text-xs mb-3">빈출 토픽 기반 독창 콘텐츠로 효율 학습</p>
-            <Link
-              href="/exam"
-              className="block text-center bg-amber-500 text-white rounded-lg py-2 text-sm font-medium hover:bg-amber-600 transition-colors"
-            >
-              검정 코너 바로가기 →
-            </Link>
-          </div>
-
           {/* 인기글 */}
           {popularPosts.length > 0 && (
             <div>
