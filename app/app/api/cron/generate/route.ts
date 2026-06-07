@@ -91,6 +91,24 @@ export async function GET(req: NextRequest) {
 
         results.push({ topic, status: 'done', slug: saved.slug })
 
+        // OneSignal 푸시 알림 발송
+        if (process.env.ONESIGNAL_REST_API_KEY) {
+          await fetch('https://onesignal.com/api/v1/notifications', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Key ${process.env.ONESIGNAL_REST_API_KEY}`,
+            },
+            body: JSON.stringify({
+              app_id: 'e4019aab-d232-4083-a13f-fe2061fe438e',
+              included_segments: ['All'],
+              headings: { ko: '세계사의 반전 — 새 글' },
+              contents: { ko: generated.title },
+              url: `https://www.askhistory.me/posts/${saved.slug}`,
+            }),
+          }).catch(() => {})
+        }
+
         // API 호출 간격
         await new Promise((r) => setTimeout(r, 5000))
       } catch (e) {
