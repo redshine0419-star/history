@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import OneSignalInit from '@/components/OneSignalInit'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,6 +22,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <head>
+        <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer />
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({ appId: "e4019aab-d232-4083-a13f-fe2061fe438e" });
+          });
+        `}} />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-M914VTSQ5M" />
         <script dangerouslySetInnerHTML={{ __html: `
           window.dataLayer = window.dataLayer || [];
@@ -39,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       </head>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
-        <OneSignalInit />
         {children}
       </body>
     </html>
