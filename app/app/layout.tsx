@@ -26,7 +26,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `
           window.OneSignalDeferred = window.OneSignalDeferred || [];
           OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({ appId: "e4019aab-d232-4083-a13f-fe2061fe438e" });
+            await OneSignal.init({
+              appId: "e4019aab-d232-4083-a13f-fe2061fe438e",
+              promptOptions: {
+                slidedown: {
+                  prompts: [{
+                    type: "push",
+                    autoPrompt: true,
+                    text: {
+                      actionMessage: "새로운 세계사 이야기를 알림으로 받아보세요!",
+                      acceptButton: "허용",
+                      cancelButton: "나중에",
+                    },
+                    delay: { pageViews: 1, timeDelay: 5 },
+                  }]
+                }
+              }
+            });
           });
         `}} />
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-M914VTSQ5M" />
