@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generatePost } from '@/lib/ai/generate'
 import { db } from '@/lib/db'
 import { posts, quizzes, examTopics } from '@/lib/db/schema'
-import { eq, notInArray, desc } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 import { slugify } from '@/lib/utils/slugify'
 import { GoogleGenAI } from '@google/genai'
 
