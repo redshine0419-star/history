@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       acceptButton: "허용",
                       cancelButton: "나중에",
                     },
-                    delay: { pageViews: 1, timeDelay: 5 },
+                    delay: { pageViews: 1, timeDelay: 0 },
                   }]
                 }
               }
