@@ -92,6 +92,18 @@ export default async function HomePage() {
 
         {/* 사이드바 */}
         <aside className="lg:col-span-1 space-y-6">
+          {/* 월드컵 특집 배너 */}
+          <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white">
+            <p className="font-bold text-sm mb-1">⚽ 월드컵 시즌 특집</p>
+            <p className="text-green-100 text-xs mb-3">축구로 읽는 세계사 이야기</p>
+            <Link
+              href="/worldcup"
+              className="block text-center bg-white text-green-700 rounded-lg py-2 text-sm font-medium hover:bg-green-50 transition-colors"
+            >
+              특집 보러가기 →
+            </Link>
+          </div>
+
           {/* 인기글 */}
           {popularPosts.length > 0 && (
             <div>

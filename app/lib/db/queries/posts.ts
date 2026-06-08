@@ -84,7 +84,14 @@ export async function incrementViewCount(id: number) {
     .where(eq(posts.id, id))
 }
 
-export async function getAllPublishedSlugs(): Promise<string[]> {
+export async function getPostsByTag(tag: string, limit = 20) {
+  return db
+    .select()
+    .from(posts)
+    .where(and(eq(posts.isPublished, true), sql`${posts.tags} @> ARRAY[${tag}]::text[]`))
+    .orderBy(desc(posts.publishedAt))
+    .limit(limit)
+}
   const result = await db
     .select({ slug: posts.slug })
     .from(posts)

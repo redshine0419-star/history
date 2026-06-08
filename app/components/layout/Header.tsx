@@ -24,6 +24,7 @@ const NAV_ITEMS = [
       { label: '현대', href: '/era/contemporary' },
     ],
   },
+  { label: '⚽ 월드컵 특집', href: '/worldcup' },
   { label: '역사 퀴즈', href: '/quiz' },
 ]
 
