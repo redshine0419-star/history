@@ -5,6 +5,7 @@ import AdsenseUnit from '@/components/ads/AdsenseUnit'
 import { getPostBySlug, incrementViewCount, getPublishedPosts } from '@/lib/db/queries/posts'
 import { buildPostMetadata } from '@/lib/seo/metadata'
 import PostCard from '@/components/post/PostCard'
+import PostActions from '@/components/post/PostActions'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -96,18 +97,12 @@ export default async function PostDetailPage({ params }: { params: { slug: strin
 
       <AdsenseUnit slot="3333333333" className="my-10" />
 
-      {/* 공유 버튼 */}
-      <div className="flex gap-3 mb-10">
-        <p className="text-sm text-gray-500">공유하기:</p>
-        <a
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://worldhistory.kr/posts/${post.slug}`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-blue-500 hover:underline"
-        >
-          X(트위터)
-        </a>
-      </div>
+      <PostActions
+        postId={post.id}
+        slug={post.slug}
+        title={post.title}
+        initialLikeCount={post.likeCount}
+      />
 
       {/* 관련 포스트 */}
       {relatedPosts.length > 0 && (
