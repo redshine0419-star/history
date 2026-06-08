@@ -1,0 +1,22 @@
+-- 월드컵 역사 이야기 20선
+INSERT INTO exam_topics (keyword, era, region, exam_level, frequency, rounds) VALUES
+('줄리메컵 도난 사건, 1966년 런던, 탐정견 피클스, 우승 트로피 분실', 'contemporary', 'europe', 'none', 3, ARRAY[0]),
+('맨발의 인도 대표팀, 1950년 브라질 월드컵, FIFA 축구화 규정 출전 포기', 'contemporary', 'americas', 'none', 3, ARRAY[0]),
+('1930년 초기 월드컵, 양복 입고 뛴 선수, 넥타이 유니폼 낭만의 시대', 'modern', 'americas', 'none', 3, ARRAY[0]),
+('월드컵 동전 던지기 승부, 승부차기 도입 이전, 예선 진출 결정 방식', 'contemporary', 'europe', 'none', 3, ARRAY[0]),
+('1978년 프랑스 대표팀 유니폼 위기, 지역 클럽 줄무늬 유니폼 대여 사건', 'contemporary', 'americas', 'none', 3, ARRAY[0]),
+('마라카낭의 비극, 1950년 브라질 우루과이 역전패, 자살자 속출 국가적 충격', 'contemporary', 'americas', 'none', 3, ARRAY[0]),
+('1966년 북한 이탈리아 격파, 아시아 최초 8강, 월드컵 최대 이변', 'contemporary', 'asia', 'none', 3, ARRAY[0]),
+('베른의 기적, 1954년 서독 헝가리 결승 역전, 전후 독일 국민 희망', 'contemporary', 'europe', 'none', 3, ARRAY[0]),
+('카잔의 기적, 2018년 대한민국 독일 2-0 격파, 디펜딩 챔피언 탈락', 'contemporary', 'asia', 'none', 3, ARRAY[0]),
+('세네갈 쇼크, 2002 한일 월드컵, 프랑스 디펜딩 챔피언 1-0 격파 이변', 'contemporary', 'middle-east-africa', 'none', 3, ARRAY[0]),
+('신의 손 Hand of God, 1986년 마라도나, 핸드볼 골 논란, 아르헨티나 잉글랜드', 'contemporary', 'americas', 'none', 3, ARRAY[0]),
+('지단 박치기, 2006년 독일 월드컵 결승, 마테라치 도발, 퇴장 충격', 'contemporary', 'europe', 'none', 3, ARRAY[0]),
+('축구 전쟁, 1969년 엘살바도르 온두라스 100시간 전쟁, 월드컵 예선 분쟁', 'contemporary', 'americas', 'none', 3, ARRAY[0]),
+('쿠웨이트 왕자의 난, 1982년 월드컵, 왕자 직접 잔디 항의 판정 번복', 'contemporary', 'middle-east-africa', 'none', 3, ARRAY[0]),
+('펠레 17세 월드컵 데뷔, 3회 우승, 축구 황제 성장기 브라질', 'contemporary', 'americas', 'none', 3, ARRAY[0]),
+('쥐스트 퐁텐 13골, 1958년 스웨덴 월드컵, 단일 대회 최다골 불멸의 기록', 'contemporary', 'europe', 'none', 3, ARRAY[0]),
+('루이스 몬티, 아르헨티나·이탈리아 두 나라 월드컵 결승 출전, 이중국적 선수', 'modern', 'europe', 'none', 3, ARRAY[0]),
+('에삼 엘 하다리, 2018년 만 45세 최고령 월드컵 출전, 이집트 골키퍼', 'contemporary', 'middle-east-africa', 'none', 3, ARRAY[0]),
+('레프 야신 검은 거미, 골키퍼 유일 발롱도르, 소련 월드컵 전설', 'contemporary', 'europe', 'none', 3, ARRAY[0]),
+('나치 독일 1936 베를린 올림픽 정치 선전, 스포츠 세탁, 히틀러', 'modern', 'europe', 'none', 3, ARRAY[0]);
