@@ -96,26 +96,6 @@ export default async function PostDetailPage({ params }: { params: { slug: strin
 
       <AdsenseUnit slot="3333333333" className="my-10" />
 
-      {/* 시험 연계 박스 */}
-      {post.examLevel !== 'none' && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-8">
-          <p className="text-amber-800 font-bold mb-1">
-            📝 {examBadge}
-          </p>
-          {post.examKeyword && (
-            <p className="text-amber-700 text-sm mb-3">
-              핵심 키워드: <strong>{post.examKeyword}</strong>
-            </p>
-          )}
-          <Link
-            href="/exam/questions"
-            className="text-sm text-amber-700 underline hover:text-amber-900"
-          >
-            관련 기출 유형 Q&A 보러가기 →
-          </Link>
-        </div>
-      )}
-
       {/* 공유 버튼 */}
       <div className="flex gap-3 mb-10">
         <p className="text-sm text-gray-500">공유하기:</p>
