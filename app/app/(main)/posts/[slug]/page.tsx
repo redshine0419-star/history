@@ -102,6 +102,7 @@ export default async function PostDetailPage({ params }: { params: { slug: strin
         slug={post.slug}
         title={post.title}
         initialLikeCount={post.likeCount}
+        fullText={post.fullStory}
       />
 
       {/* 관련 포스트 */}

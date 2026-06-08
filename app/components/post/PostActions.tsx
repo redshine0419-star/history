@@ -1,18 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 interface Props {
   postId: number
   slug: string
   title: string
   initialLikeCount: number
+  fullText: string
 }
 
-export default function PostActions({ postId, slug, title, initialLikeCount }: Props) {
+export default function PostActions({ postId, slug, title, initialLikeCount, fullText }: Props) {
   const [likeCount, setLikeCount] = useState(initialLikeCount)
   const [liked, setLiked] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [speaking, setSpeaking] = useState(false)
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   const handleLike = async () => {
     if (liked) return
@@ -27,8 +30,29 @@ export default function PostActions({ postId, slug, title, initialLikeCount }: P
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleSpeak = () => {
+    if (!window.speechSynthesis) return
+
+    if (speaking) {
+      window.speechSynthesis.cancel()
+      setSpeaking(false)
+      return
+    }
+
+    const text = `${title}. ${fullText.replace(/<[^>]*>/g, '').replace(/#{1,6}\s/g, '').replace(/\n+/g, ' ')}`
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'ko-KR'
+    utterance.rate = 1.0
+    utterance.onend = () => setSpeaking(false)
+    utterance.onerror = () => setSpeaking(false)
+    utteranceRef.current = utterance
+
+    window.speechSynthesis.speak(utterance)
+    setSpeaking(true)
+  }
+
   return (
-    <div className="flex items-center gap-3 py-6 border-t border-b border-gray-100 mb-8">
+    <div className="flex flex-wrap items-center gap-3 py-6 border-t border-b border-gray-100 mb-8">
       <button
         onClick={handleLike}
         className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -45,23 +69,14 @@ export default function PostActions({ postId, slug, title, initialLikeCount }: P
         {copied ? '✅ 복사됨' : '🔗 링크 복사'}
       </button>
 
-      <a
-        href={`https://story.kakao.com/share?url=${encodeURIComponent(`https://www.askhistory.me/posts/${slug}`)}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors"
+      <button
+        onClick={handleSpeak}
+        className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          speaking ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
+        }`}
       >
-        카카오 공유
-      </a>
-
-      <a
-        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(`https://www.askhistory.me/posts/${slug}`)}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-      >
-        𝕏 공유
-      </a>
+        {speaking ? '⏹ 읽기 중지' : '🔊 듣기'}
+      </button>
     </div>
   )
 }
