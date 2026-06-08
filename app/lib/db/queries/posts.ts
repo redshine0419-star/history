@@ -92,6 +92,8 @@ export async function getPostsByTag(tag: string, limit = 20) {
     .orderBy(desc(posts.publishedAt))
     .limit(limit)
 }
+
+export async function getAllPublishedSlugs(): Promise<string[]> {
   const result = await db
     .select({ slug: posts.slug })
     .from(posts)
