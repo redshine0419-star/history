@@ -28,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
               appId: "e4019aab-d232-4083-a13f-fe2061fe438e",
+              language: "ko",
               promptOptions: {
                 slidedown: {
                   prompts: [{
