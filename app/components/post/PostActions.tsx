@@ -27,13 +27,7 @@ export default function PostActions({ postId, slug, title, initialLikeCount }: P
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleKakao = () => {
-    const url = `https://www.askhistory.me/posts/${slug}`
-    window.open(
-      `https://sharer.kakao.com/talk/friends/picker/link?app_key=none&text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
-      '_blank'
-    )
-  }
+  const kakaoUrl = `https://www.askhistory.me/posts/${slug}`
 
   return (
     <div className="flex items-center gap-3 py-6 border-t border-b border-gray-100 mb-8">
@@ -52,6 +46,15 @@ export default function PostActions({ postId, slug, title, initialLikeCount }: P
       >
         {copied ? '✅ 복사됨' : '🔗 링크 복사'}
       </button>
+
+      <a
+        href={`https://sharer.kakao.com/talk/friends/picker/link?app_key=none&text=${encodeURIComponent(title)}&url=${encodeURIComponent(kakaoUrl)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors"
+      >
+        카카오 공유
+      </a>
 
       <a
         href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(`https://www.askhistory.me/posts/${slug}`)}`}
