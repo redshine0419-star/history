@@ -91,30 +91,31 @@ export async function GET(req: NextRequest) {
 
         results.push({ topic, status: 'done', slug: saved.slug })
 
-        // OneSignal 푸시 알림 발송
-        if (process.env.ONESIGNAL_REST_API_KEY) {
-          await fetch('https://onesignal.com/api/v1/notifications', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Key ${process.env.ONESIGNAL_REST_API_KEY}`,
-            },
-            body: JSON.stringify({
-              app_id: 'e4019aab-d232-4083-a13f-fe2061fe438e',
-              target_channel: 'push',
-              included_segments: ['All'],
-              headings: { en: '세계사의 반전 — 새 글', ko: '세계사의 반전 — 새 글' },
-              contents: { en: generated.title, ko: generated.title },
-              url: `https://www.askhistory.me/posts/${saved.slug}`,
-            }),
-          }).catch(() => {})
-        }
-
         // API 호출 간격
         await new Promise((r) => setTimeout(r, 5000))
       } catch (e) {
         results.push({ topic, status: 'error: ' + String(e) })
       }
+    }
+
+    // 마지막 성공한 글 1개만 푸시 발송
+    const lastDone = results.filter((r) => r.status === 'done').slice(-1)[0]
+    if (lastDone && lastDone.slug && process.env.ONESIGNAL_REST_API_KEY) {
+      await fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Key ${process.env.ONESIGNAL_REST_API_KEY}`,
+        },
+        body: JSON.stringify({
+          app_id: 'e4019aab-d232-4083-a13f-fe2061fe438e',
+          target_channel: 'push',
+          included_segments: ['All'],
+          headings: { en: '세계사의 반전 — 새 글', ko: '세계사의 반전 — 새 글' },
+          contents: { en: lastDone.topic, ko: lastDone.topic },
+          url: `https://www.askhistory.me/posts/${lastDone.slug}`,
+        }),
+      }).catch(() => {})
     }
 
     return NextResponse.json({ success: true, generated: results.length, results })
