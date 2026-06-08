@@ -27,8 +27,6 @@ export default function PostActions({ postId, slug, title, initialLikeCount }: P
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const kakaoUrl = `https://www.askhistory.me/posts/${slug}`
-
   return (
     <div className="flex items-center gap-3 py-6 border-t border-b border-gray-100 mb-8">
       <button
