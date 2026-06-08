@@ -21,8 +21,8 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       app_id: 'e4019aab-d232-4083-a13f-fe2061fe438e',
       included_segments: ['All'],
-      headings: { ko: title },
-      contents: { ko: message },
+      headings: { en: title, ko: title },
+      contents: { en: message, ko: message },
       url,
     }),
   })
