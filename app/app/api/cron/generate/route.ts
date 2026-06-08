@@ -101,7 +101,8 @@ export async function GET(req: NextRequest) {
             },
             body: JSON.stringify({
               app_id: 'e4019aab-d232-4083-a13f-fe2061fe438e',
-              included_segments: ['Subscribed Users'],
+              target_channel: 'push',
+              included_segments: ['All'],
               headings: { en: '세계사의 반전 — 새 글', ko: '세계사의 반전 — 새 글' },
               contents: { en: generated.title, ko: generated.title },
               url: `https://www.askhistory.me/posts/${saved.slug}`,
