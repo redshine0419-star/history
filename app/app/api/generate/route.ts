@@ -3,6 +3,7 @@ import { generatePost } from '@/lib/ai/generate'
 import { db } from '@/lib/db'
 import { posts, quizzes } from '@/lib/db/schema'
 import { slugify } from '@/lib/utils/slugify'
+import { fetchUnsplashThumbnail } from '@/lib/unsplash'
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get('x-admin-key')
@@ -17,6 +18,7 @@ export async function POST(req: NextRequest) {
 
   if (save) {
     const slug = generated.slug || slugify(generated.title).replace(/[^\x00-\x7F]/g, '').replace(/--+/g, '-').slice(0, 80)
+    const thumbnail = await fetchUnsplashThumbnail(generated.tags?.[0] ?? topic)
     const [saved] = await db
       .insert(posts)
       .values({
@@ -33,6 +35,7 @@ export async function POST(req: NextRequest) {
         tags: generated.tags,
         seoTitle: generated.seoTitle,
         seoDesc: generated.seoDesc,
+        thumbnail: thumbnail ?? undefined,
         isPublished: true,
         publishedAt: new Date(),
       })

@@ -5,6 +5,7 @@ import { posts, quizzes, examTopics } from '@/lib/db/schema'
 import { eq, desc } from 'drizzle-orm'
 import { slugify } from '@/lib/utils/slugify'
 import { GoogleGenAI } from '@google/genai'
+import { fetchUnsplashThumbnail } from '@/lib/unsplash'
 
 const DAILY_COUNT = 5
 
@@ -57,6 +58,7 @@ export async function GET(req: NextRequest) {
       try {
         const generated = await generatePost(topic)
         const slug = generated.slug || slugify(generated.title).replace(/[^\x00-\x7F]/g, '').replace(/--+/g, '-').slice(0, 80)
+        const thumbnail = await fetchUnsplashThumbnail(generated.tags?.[0] ?? topic)
 
         const [saved] = await db.insert(posts).values({
           slug,
@@ -72,6 +74,7 @@ export async function GET(req: NextRequest) {
           tags: generated.tags,
           seoTitle: generated.seoTitle,
           seoDesc: generated.seoDesc,
+          thumbnail: thumbnail ?? undefined,
           isPublished: true,
           publishedAt: new Date(),
         }).returning()
