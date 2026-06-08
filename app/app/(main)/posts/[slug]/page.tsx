@@ -6,6 +6,7 @@ import { getPostBySlug, incrementViewCount, getPublishedPosts } from '@/lib/db/q
 import { buildPostMetadata } from '@/lib/seo/metadata'
 import PostCard from '@/components/post/PostCard'
 import PostActions from '@/components/post/PostActions'
+import ListenButton from '@/components/post/ListenButton'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -77,7 +78,9 @@ export default async function PostDetailPage({ params }: { params: { slug: strin
         )}
       </div>
 
-      <h1 className="text-2xl md:text-3xl font-bold leading-snug mb-6">{post.title}</h1>
+      <h1 className="text-2xl md:text-3xl font-bold leading-snug mb-4">{post.title}</h1>
+
+      <ListenButton title={post.title} fullText={post.fullStory} />
 
       <AdsenseUnit slot="2222222222" className="mb-8" />
 

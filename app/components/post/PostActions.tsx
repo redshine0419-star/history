@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 
 interface Props {
   postId: number
@@ -10,12 +10,10 @@ interface Props {
   fullText: string
 }
 
-export default function PostActions({ postId, slug, title, initialLikeCount, fullText }: Props) {
+export default function PostActions({ postId, slug, initialLikeCount }: Props) {
   const [likeCount, setLikeCount] = useState(initialLikeCount)
   const [liked, setLiked] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [speaking, setSpeaking] = useState(false)
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
   const handleLike = async () => {
     if (liked) return
@@ -69,14 +67,6 @@ export default function PostActions({ postId, slug, title, initialLikeCount, ful
         {copied ? '✅ 복사됨' : '🔗 링크 복사'}
       </button>
 
-      <button
-        onClick={handleSpeak}
-        className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-          speaking ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
-        }`}
-      >
-        {speaking ? '⏹ 읽기 중지' : '🔊 듣기'}
-      </button>
     </div>
   )
 }
