@@ -48,7 +48,7 @@ export default function PostActions({ postId, slug, title, initialLikeCount }: P
       </button>
 
       <a
-        href={`https://sharer.kakao.com/talk/friends/picker/link?app_key=none&text=${encodeURIComponent(title)}&url=${encodeURIComponent(kakaoUrl)}`}
+        href={`https://story.kakao.com/share?url=${encodeURIComponent(`https://www.askhistory.me/posts/${slug}`)}`}
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-colors"
