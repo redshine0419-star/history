@@ -175,22 +175,35 @@ export default function BatchGeneratePage() {
       <div className="bg-white border rounded-xl p-5 space-y-4">
         <h2 className="text-sm font-semibold">새 주제 추천</h2>
         <div>
-          <label className="block text-sm text-gray-600 mb-1">직접 추가할 주제 (선택 — 줄바꿈으로 구분)</label>
+          <label className="block text-sm text-gray-600 mb-1">직접 입력할 주제 (줄바꿈으로 구분)</label>
           <textarea
             value={customTopics}
             onChange={(e) => setCustomTopics(e.target.value)}
-            rows={2}
-            placeholder={'예:\n위그노 전쟁\n영국 동인도회사'}
+            rows={6}
+            placeholder={'예:\n줄리메컵 도난 사건, 1966년 런던, 탐정견 피클스\n마라카낭의 비극, 1950년 브라질 우루과이\n신의 손 마라도나'}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
           />
         </div>
-        <button
-          onClick={suggestTopics}
-          disabled={loadingTopics || !adminKey.trim()}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50"
-        >
-          {loadingTopics ? 'AI가 주제 추천 중...' : '🤖 기존 글 제외하고 20개 주제 추천'}
-        </button>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => {
+              const extras = customTopics.split('\n').map((s) => s.trim()).filter(Boolean)
+              if (extras.length === 0) { alert('주제를 입력하세요.'); return }
+              setJobs(extras.map((t) => ({ topic: t, hint: '', status: 'pending' as const })))
+            }}
+            disabled={!adminKey.trim() || !customTopics.trim()}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:opacity-50"
+          >
+            ✍️ 직접 입력 주제로 생성 목록 설정
+          </button>
+          <button
+            onClick={suggestTopics}
+            disabled={loadingTopics || !adminKey.trim()}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {loadingTopics ? 'AI가 주제 추천 중...' : '🤖 AI 주제 20개 추천'}
+          </button>
+        </div>
       </div>
 
       {/* 생성 목록 & 실행 */}
