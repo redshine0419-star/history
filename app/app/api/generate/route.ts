@@ -17,29 +17,41 @@ export async function POST(req: NextRequest) {
   const generated = await generatePost(topic, hint)
 
   if (save) {
-    const slug = generated.slug || slugify(generated.title).replace(/[^\x00-\x7F]/g, '').replace(/--+/g, '-').slice(0, 80)
+    const baseSlug = generated.slug || slugify(generated.title).replace(/[^\x00-\x7F]/g, '').replace(/--+/g, '-').slice(0, 80)
     const thumbnail = await fetchUnsplashThumbnail(generated.tags?.[0] ?? topic)
-    const [saved] = await db
-      .insert(posts)
-      .values({
-        slug,
-        title: generated.title,
-        question: generated.question,
-        answer: generated.answer,
-        fullStory: generated.fullStory,
-        summary: generated.summary,
-        region: generated.region,
-        era: generated.era,
-        examLevel: generated.examLevel,
-        examKeyword: generated.examKeyword,
-        tags: generated.tags,
-        seoTitle: generated.seoTitle,
-        seoDesc: generated.seoDesc,
-        thumbnail: thumbnail ?? undefined,
-        isPublished: true,
-        publishedAt: new Date(),
-      })
-      .returning()
+
+    let slug = baseSlug
+    let saved
+    for (let attempt = 0; attempt < 5; attempt++) {
+      if (attempt > 0) slug = `${baseSlug}-${attempt}`
+      try {
+        ;[saved] = await db.insert(posts).values({
+          slug,
+          title: generated.title,
+          question: generated.question,
+          answer: generated.answer,
+          fullStory: generated.fullStory,
+          summary: generated.summary,
+          region: generated.region,
+          era: generated.era,
+          examLevel: generated.examLevel,
+          examKeyword: generated.examKeyword,
+          tags: generated.tags,
+          seoTitle: generated.seoTitle,
+          seoDesc: generated.seoDesc,
+          thumbnail: thumbnail ?? undefined,
+          isPublished: true,
+          publishedAt: new Date(),
+        }).returning()
+        break
+      } catch (e: unknown) {
+        const msg = String(e)
+        if (msg.includes('duplicate') || msg.includes('unique')) continue
+        throw e
+      }
+    }
+
+    if (!saved) return NextResponse.json({ error: 'slug conflict' }, { status: 409 })
 
     // 퀴즈 저장
     if (generated.quizzes?.length && saved.id) {
