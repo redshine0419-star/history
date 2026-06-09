@@ -9,7 +9,7 @@ import { postTweet, buildTweetText } from '@/lib/twitter'
 
 const DAILY_COUNT = 5
 
-const AH_CTA = `\n\n---\n\n> 📚 **세계사를 AI와 함께 재미있게 공부하세요**  \n> AskHistory에서 퀴즈와 Q&A로 수능·세계사 시험을 완벽하게 준비해보세요.  \n> [→ AskHistory 무료 시작](https://askhistory.me)\n`
+const AH_CTA = `\n\n---\n\n> 📚 **세계사를 AI와 함께 재미있게 공부하세요**  \n> AskHistory에서 퀴즈와 Q&A로 수능·세계사 시험을 완벽하게 준비해보세요.  \n> [→ AskHistory 무료 시작](https://askhistory.me?utm_source=blog&utm_medium=cta&utm_campaign=organic)\n`
 
 async function notifySlack(msg: string) {
   if (!process.env.SLACK_WEBHOOK_URL) return
