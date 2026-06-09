@@ -5,6 +5,7 @@ import { posts, quizzes, examTopics } from '@/lib/db/schema'
 import { eq, desc, gte } from 'drizzle-orm'
 import { slugify } from '@/lib/utils/slugify'
 import { GoogleGenAI } from '@google/genai'
+import { postTweet, buildTweetText } from '@/lib/twitter'
 
 const DAILY_COUNT = 5
 
@@ -117,6 +118,9 @@ export async function GET(req: NextRequest) {
         }
 
         await notifySlack(`📜 [AskHistory] 새 포스트 발행\n제목: ${saved.title}\n시대: ${generated.era || '-'}\nURL: https://askhistory.me/post/${saved.slug}`)
+
+        const tweetText = buildTweetText(saved.title, generated.summary || '', `https://askhistory.me/post/${saved.slug}`, '#세계사 #역사 #공부')
+        await postTweet(tweetText)
 
         results.push({ topic, status: 'done', slug: saved.slug })
 
