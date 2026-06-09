@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getPublishedPosts } from '@/lib/db/queries/posts';
+import { db } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
@@ -17,14 +20,19 @@ export async function GET() {
       publishedAt: p.publishedAt,
     }));
 
+    let emailSubscribers = 0;
+    try {
+      const result = await db.execute(
+        `SELECT COUNT(*) as count FROM email_subscribers WHERE service = 'askhistory'`
+      );
+      emailSubscribers = Number((result as { rows: { count: string }[] }).rows[0]?.count ?? 0);
+    } catch { /* table may not exist yet */ }
+
     return NextResponse.json({
       service: 'askhistory',
       domain: 'askhistory.me',
-      blog: {
-        total: allPosts.length,
-        recentWeek: recentWeekCount,
-        recent: recent5,
-      },
+      blog: { total: allPosts.length, recentWeek: recentWeekCount, recent: recent5 },
+      emailSubscribers,
       updatedAt: new Date().toISOString(),
     });
   } catch (e) {
