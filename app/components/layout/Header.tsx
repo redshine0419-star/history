@@ -25,6 +25,7 @@ const NAV_ITEMS = [
     ],
   },
   { label: '역사 퀴즈', href: '/quiz' },
+  { label: '의견 보내기', href: '/feedback' },
 ]
 
 export default function Header() {
