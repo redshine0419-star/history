@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const generated = await generatePost(topic, hint)
 
   if (save) {
-    const slug = slugify(generated.title)
+    const slug = generated.slug || slugify(generated.title).replace(/[^\x00-\x7F]/g, '').replace(/--+/g, '-').slice(0, 80)
     const [saved] = await db
       .insert(posts)
       .values({

@@ -3,7 +3,8 @@ import PostCard from '@/components/post/PostCard'
 import AdsenseUnit from '@/components/ads/AdsenseUnit'
 import { getPublishedPosts } from '@/lib/db/queries/posts'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: '전체 이야기',

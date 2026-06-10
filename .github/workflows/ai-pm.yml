@@ -1,0 +1,108 @@
+name: AI PM Auto Blog
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  handle-issue:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Handle AI PM Issue
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, re, requests
+          from datetime import datetime
+
+          GEMINI_API_KEY = os.environ['GEMINI_API_KEY']
+          GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
+          ISSUE_TITLE = os.environ['ISSUE_TITLE']
+          ISSUE_BODY = os.environ['ISSUE_BODY']
+          ISSUE_NUMBER = os.environ['ISSUE_NUMBER']
+          REPO = os.environ['REPO']
+
+          if '[AI PM]' not in ISSUE_TITLE:
+              exit(0)
+
+          BLOG_KEYWORDS = ['블로그', 'blog', '콘텐츠', 'content', '발행', '포스트', 'post', '작성', '역사', '이야기']
+          text = (ISSUE_TITLE + ' ' + ISSUE_BODY).lower()
+          is_blog = any(kw in text for kw in BLOG_KEYWORDS)
+
+          def gh_comment(body):
+              requests.post(
+                  f'https://api.github.com/repos/{REPO}/issues/{ISSUE_NUMBER}/comments',
+                  headers={'Authorization': f'Bearer {GITHUB_TOKEN}', 'Accept': 'application/vnd.github+json'},
+                  json={'body': body}
+              )
+
+          def gh_close():
+              requests.patch(
+                  f'https://api.github.com/repos/{REPO}/issues/{ISSUE_NUMBER}',
+                  headers={'Authorization': f'Bearer {GITHUB_TOKEN}', 'Accept': 'application/vnd.github+json'},
+                  json={'state': 'closed'}
+              )
+
+          def gh_label(label):
+              requests.post(
+                  f'https://api.github.com/repos/{REPO}/issues/{ISSUE_NUMBER}/labels',
+                  headers={'Authorization': f'Bearer {GITHUB_TOKEN}', 'Accept': 'application/vnd.github+json'},
+                  json={'labels': [label]}
+              )
+
+          if is_blog:
+              topic = re.sub(r'\[AI PM\]', '', ISSUE_TITLE).strip()
+
+              # Generate blog content with Gemini
+              prompt = f"""다음 주제로 AskHistory(역사 학습 플랫폼) 블로그 포스트를 작성하세요.
+주제: {topic}
+역사적 정확성을 유지하면서 흥미롭게 작성하세요.
+다음 JSON만 응답하세요:
+{{
+  "title": "제목",
+  "summary": "요약 (2문장)",
+  "content": "마크다운 본문 (800자 이상)",
+  "tags": ["태그입니다"]
+}}"""
+
+              try:
+                  res = requests.post(
+                      f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}',
+                      json={{
+                          'contents': [{{'parts': [{{'text': prompt}}]}}],
+                          'generationConfig': {{'responseMimeType': 'application/json'}}
+                      }},
+                      headers={{'Content-Type': 'application/json'}},
+                      timeout=60
+                  )
+                  data = res.json()['candidates'][0]['content']['parts'][0]['text']
+                  blog = json.loads(data)
+
+                  # Post generated content as comment for review
+                  preview = blog.get('content','')[:300]
+                  gh_comment(f"""✅ **AI PM 블로그 생성 완료** (관리자 검토 후 발행)
+
+**제목:** {blog.get('title','')}
+**요약:** {blog.get('summary','')}
+
+**본문 미리보기:**
+{preview}...
+
+📝 관리자가 askhistory.me 관리 페이지에서 검토 후 발행하세요.""")
+                  gh_close()
+                  print(f'Blog generated for topic: {topic}')
+              except Exception as e:
+                  print(f'Error: {e}')
+                  gh_comment(f'⚠️ 생성 실패: {e}')
+          else:
+              gh_label('needs-dev')
+              gh_comment('🔧 **코드 개발 이슈**\n\n대시보드에서 검토 후 처리됩니다.')
+          PYEOF

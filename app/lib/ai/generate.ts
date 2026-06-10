@@ -15,6 +15,7 @@ const SYSTEM_PROMPT = `
 
 반드시 아래 JSON 형식으로만 응답해 (마크다운 코드블록 없이 순수 JSON):
 {
+  "slug": "영문-소문자-하이픈-URL-슬러그 (예: black-death-europe-1347, 30자 이내, 영문과 하이픈만 사용)",
   "title": "SEO 제목 (55~65자, 키워드 포함)",
   "question": "호기심을 자극하는 질문 (30~50자)",
   "answer": "핵심 답변 한 줄 (50~80자, 결론 먼저)",
@@ -59,6 +60,7 @@ export interface QuizItem {
 }
 
 export interface GeneratedPost {
+  slug: string
   title: string
   question: string
   answer: string

@@ -5,7 +5,8 @@ import { getExamTopics } from '@/lib/db/queries/exam'
 import { getExamPosts } from '@/lib/db/queries/posts'
 import PostCard from '@/components/post/PostCard'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: '세계사 검정 대비',
