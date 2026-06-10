@@ -2,14 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { generatePost } from '@/lib/ai/generate'
 import { db } from '@/lib/db'
 import { posts, quizzes, examTopics } from '@/lib/db/schema'
-import { eq, notInArray, desc } from 'drizzle-orm'
+import { eq, desc, gte } from 'drizzle-orm'
 import { slugify } from '@/lib/utils/slugify'
 import { GoogleGenAI } from '@google/genai'
+import { postTweet, buildTweetText } from '@/lib/twitter'
 
 const DAILY_COUNT = 5
 
+const AH_CTA = `\n\n---\n\n> 📚 **세계사를 AI와 함께 재미있게 공부하세요**  \n> AskHistory에서 퀴즈와 Q&A로 수능·세계사 시험을 완벽하게 준비해보세요.  \n> [→ AskHistory 무료 시작](https://askhistory.me?utm_source=blog&utm_medium=cta&utm_campaign=organic)\n`
+
+async function notifySlack(msg: string) {
+  if (!process.env.SLACK_WEBHOOK_URL) return
+  await fetch(process.env.SLACK_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: msg }),
+  }).catch(() => {})
+}
+
 export async function GET(req: NextRequest) {
-  // Vercel Cron 인증
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -18,7 +29,6 @@ export async function GET(req: NextRequest) {
   const results: { topic: string; status: string; slug?: string }[] = []
 
   try {
-    // 기존 포스트 제목 목록
     const existingPosts = await db
       .select({ title: posts.title })
       .from(posts)
@@ -26,18 +36,36 @@ export async function GET(req: NextRequest) {
 
     const existingTitles = existingPosts.map((p) => p.title)
 
-    // exam_topics에서 아직 포스트가 없는 토픽 우선 사용
-    const pendingTopics = await db
-      .select({ keyword: examTopics.keyword })
+    // Era-balanced selection: prefer eras not covered in the last 14 days
+    const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
+    const recentEraRows = await db
+      .select({ era: posts.era })
+      .from(posts)
+      .where(gte(posts.publishedAt, twoWeeksAgo))
+      .catch(() => [])
+
+    const eraCountMap: Record<string, number> = {}
+    for (const r of recentEraRows) {
+      if (r.era) eraCountMap[r.era] = (eraCountMap[r.era] || 0) + 1
+    }
+
+    // Get pending topics with era info, more than needed for sorting
+    const pendingTopicsRaw = await db
+      .select({ keyword: examTopics.keyword, era: examTopics.era })
       .from(examTopics)
       .where(eq(examTopics.postId, null as unknown as number))
       .orderBy(desc(examTopics.frequency))
-      .limit(DAILY_COUNT)
+      .limit(50)
       .catch(() => [])
 
-    let topics: string[] = pendingTopics.map((t) => t.keyword)
+    // Sort by era count ascending (eras with fewer recent posts come first)
+    const sortedPending = [...pendingTopicsRaw].sort(
+      (a, b) => (eraCountMap[a.era] || 0) - (eraCountMap[b.era] || 0)
+    )
 
-    // exam_topics가 부족하면 Gemini로 추가 추천
+    let topics: string[] = sortedPending.slice(0, DAILY_COUNT).map((t) => t.keyword)
+
+    // Fill remaining with Gemini suggestions if needed
     if (topics.length < DAILY_COUNT) {
       const needed = DAILY_COUNT - topics.length
       const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
@@ -52,7 +80,7 @@ export async function GET(req: NextRequest) {
       topics = [...topics, ...suggested.slice(0, needed)]
     }
 
-    // 순차 생성
+    // Generate posts sequentially
     for (const topic of topics.slice(0, DAILY_COUNT)) {
       try {
         const generated = await generatePost(topic)
@@ -63,7 +91,7 @@ export async function GET(req: NextRequest) {
           title: generated.title,
           question: generated.question,
           answer: generated.answer,
-          fullStory: generated.fullStory,
+          fullStory: (generated.fullStory || '') + AH_CTA,
           summary: generated.summary,
           region: generated.region,
           era: generated.era,
@@ -89,9 +117,13 @@ export async function GET(req: NextRequest) {
           )
         }
 
+        await notifySlack(`📜 [AskHistory] 새 포스트 발행\n제목: ${saved.title}\n시대: ${generated.era || '-'}\nURL: https://askhistory.me/post/${saved.slug}`)
+
+        const tweetText = buildTweetText(saved.title, generated.summary || '', `https://askhistory.me/post/${saved.slug}`, '#세계사 #역사 #공부')
+        await postTweet(tweetText)
+
         results.push({ topic, status: 'done', slug: saved.slug })
 
-        // API 호출 간격
         await new Promise((r) => setTimeout(r, 5000))
       } catch (e) {
         results.push({ topic, status: 'error: ' + String(e) })

@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { getAllPublishedSlugs } from '@/lib/db/queries/posts'
 
+export const dynamic = 'force-dynamic'
+
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://worldhistory.kr'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
