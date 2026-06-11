@@ -40,6 +40,7 @@ export const posts = pgTable('posts', {
   seoTitle:    varchar('seo_title', { length: 65 }),
   seoDesc:     varchar('seo_desc', { length: 160 }),
   thumbnail:   varchar('thumbnail', { length: 500 }),
+  lang:        varchar('lang', { length: 10 }).default('ko').notNull(),
   viewCount:   integer('view_count').default(0).notNull(),
   likeCount:   integer('like_count').default(0).notNull(),
   isPublished: boolean('is_published').default(false).notNull(),
