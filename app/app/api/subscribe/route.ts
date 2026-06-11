@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sql } from 'drizzle-orm'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,8 +45,7 @@ export async function POST(req: NextRequest) {
       )
     `).catch(() => {})
     await db.execute(
-      `INSERT INTO email_subscribers (email, service, source) VALUES ($1, 'askhistory', $2) ON CONFLICT (email, service) DO NOTHING`,
-      [email, source ?? 'landing']
+      sql`INSERT INTO email_subscribers (email, service, source) VALUES (${email}, 'askhistory', ${source ?? 'landing'}) ON CONFLICT (email, service) DO NOTHING`
     ).catch(() => {})
 
     await sendWelcomeEmail(email)
