@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   if (cleanContent.length > 1000)
     return NextResponse.json({ error: '최대 1000자까지 가능합니다.' }, { status: 400 })
 
-  const { a, op, b } = parseCaptcha(captchaQuestion ?? '')
+  const { a, op, b } = parseCaptcha(String(captchaQuestion ?? ''))
   const expected = op === '+' ? a + b : a - b
   if (Number(captchaAnswer) !== expected)
     return NextResponse.json({ error: '자동 입력 방지 답이 틀렸습니다.' }, { status: 400 })
