@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     ORDER BY created_at DESC LIMIT ${pageSize} OFFSET ${offset}
   `)
   const countResult = await db.execute(sql`SELECT COUNT(*)::int AS count FROM feedback WHERE is_hidden = false`)
-  const total = (countResult.rows[0] as any)?.count ?? 0
+  const total = (countResult.rows[0] as { count: number })?.count ?? 0
 
   return NextResponse.json({ rows: rows.rows, total, page, pageSize })
 }
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   await ensureTable()
 
-  let body: any
+  let body: { nickname?: unknown; content?: unknown; rating?: unknown; captchaAnswer?: unknown; captchaQuestion?: unknown; honeypot?: unknown }
   try { body = await req.json() } catch { return NextResponse.json({ error: '잘못된 요청입니다.' }, { status: 400 }) }
 
   const { nickname, content, rating, captchaAnswer, captchaQuestion, honeypot } = body
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
   const recentResult = await db.execute(sql`
     SELECT COUNT(*)::int AS count FROM feedback WHERE ip_hash = ${ipHash} AND created_at > ${since}
   `)
-  const recentCount = (recentResult.rows[0] as any)?.count ?? 0
+  const recentCount = (recentResult.rows[0] as { count: number })?.count ?? 0
   if (recentCount >= RATE_LIMIT_MAX)
     return NextResponse.json({ error: '잠시 후 다시 시도해주세요. (10분에 3개 제한)' }, { status: 429 })
 

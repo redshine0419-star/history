@@ -1,6 +1,14 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 
+interface FeedbackRow {
+  id: number
+  nickname: string
+  content: string
+  rating: number | null
+  created_at: string
+}
+
 const SERVICE_NAME = 'AskHistory'
 const SERVICE_DESC = '역사 질문·답변 플랫폼에 대한 의견을 남겨주세요.'
 const API_BASE = '/api/feedback'
@@ -39,7 +47,7 @@ function Stars({ value, onChange }: { value: number; onChange?: (v: number) => v
 }
 
 export default function FeedbackPage() {
-  const [posts, setPosts] = useState<any[]>([])
+  const [posts, setPosts] = useState<FeedbackRow[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -150,7 +158,7 @@ export default function FeedbackPage() {
           <div className="text-center py-16 text-gray-400"><p className="text-3xl mb-3">💬</p><p>아직 의견이 없습니다.</p></div>
         ) : (
           <div className="space-y-3">
-            {posts.map((p: any) => (
+            {posts.map((p) => (
               <div key={p.id} className="bg-white border border-gray-200 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   {p.rating && <Stars value={p.rating} />}
