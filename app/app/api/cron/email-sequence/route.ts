@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { sql } from 'drizzle-orm'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,8 +66,7 @@ export async function GET(req: NextRequest) {
     const windowStart = new Date(now.getTime() - (step.dayOffset + 0.5) * 86400000).toISOString()
     const windowEnd = new Date(now.getTime() - (step.dayOffset - 0.5) * 86400000).toISOString()
     const rows = await db.execute(
-      `SELECT email FROM email_subscribers WHERE service = 'askhistory' AND created_at BETWEEN $1 AND $2`,
-      [windowStart, windowEnd]
+      sql`SELECT email FROM email_subscribers WHERE service = 'askhistory' AND created_at BETWEEN ${windowStart} AND ${windowEnd}`
     ).catch(() => ({ rows: [] }))
     for (const row of (rows as { rows: { email: string }[] }).rows) {
       await sendEmail(row.email, step.subject, step.html)
