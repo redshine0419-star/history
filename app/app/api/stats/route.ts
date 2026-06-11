@@ -25,7 +25,7 @@ export async function GET() {
       const result = await db.execute(
         `SELECT COUNT(*) as count FROM email_subscribers WHERE service = 'askhistory'`
       );
-      emailSubscribers = Number((result as { rows: { count: string }[] }).rows[0]?.count ?? 0);
+      emailSubscribers = Number((result as unknown as { rows: { count: string }[] }).rows[0]?.count ?? 0);
     } catch { /* table may not exist yet */ }
 
     return NextResponse.json({
