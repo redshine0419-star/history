@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/exam/guide`, priority: 0.7 },
     { url: `${BASE_URL}/exam/questions`, priority: 0.8 },
     { url: `${BASE_URL}/quiz`, priority: 0.7 },
+    { url: `${BASE_URL}/feedback`, priority: 0.5 },
     { url: `${BASE_URL}/region/europe`, priority: 0.7 },
     { url: `${BASE_URL}/region/asia`, priority: 0.7 },
     { url: `${BASE_URL}/region/middle-east-africa`, priority: 0.7 },
